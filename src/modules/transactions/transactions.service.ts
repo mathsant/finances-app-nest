@@ -9,6 +9,7 @@ import { Transaction, User } from 'src/schemas';
 import { CreateTransactionDto } from './dto';
 import { isNil } from 'ramda';
 import { v4 as uuidv4 } from 'uuid';
+import { TypeTransactionEnum } from './enums';
 
 @Injectable()
 export class TransactionsService {
@@ -32,8 +33,11 @@ export class TransactionsService {
     return transaction;
   }
 
-  async create(transactionDto: CreateTransactionDto): Promise<Transaction> {
-    const { amount, userId } = transactionDto;
+  async create(
+    transactionDto: CreateTransactionDto,
+    userId: string,
+  ): Promise<Transaction> {
+    const { amount, type, category, paymentMethod } = transactionDto;
 
     const userFound = await this.userModel.findOne({ id: userId }).exec();
     if (isNil(userFound))
@@ -46,8 +50,10 @@ export class TransactionsService {
         message: 'Amount should be biggiest of zero.',
       });
 
-    userFound.budget -= amount;
-    userFound.save();
+    if (type === TypeTransactionEnum.ENTRY) userFound.budget += amount;
+    else userFound.budget -= amount;
+
+    await userFound.save();
 
     const uuidGenerated = uuidv4();
 
@@ -55,18 +61,26 @@ export class TransactionsService {
       amount,
       id: uuidGenerated,
       userId,
+      category,
+      paymentMethod,
+      type,
     });
 
     return transactionCreated;
   }
 
-  async findTransactionsBetweenDates(initialDate: Date, finalDate: Date) {
+  async findTransactionsBetweenDates(
+    initialDate: Date,
+    finalDate: Date,
+    userId: string,
+  ) {
     if (isNil(initialDate) || isNil(finalDate))
       throw new BadRequestException({ message: 'Invalid Dates.' });
 
     return this.transactionModel
       .find({
         createdAt: { $gte: new Date(initialDate), $lte: new Date(finalDate) },
+        userId,
       })
       .exec();
   }

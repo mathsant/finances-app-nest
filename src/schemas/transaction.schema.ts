@@ -16,14 +16,20 @@ export class Transaction {
   @Prop({ required: true })
   userId: string;
 
+  @Prop({ required: true })
+  type: string;
+
   @Prop({ required: false, default: CategoryTransactionEnum.OTHER })
   category: string;
 
-  @Prop({ required: true, default: PaymentMethodEnum.OTHER })
+  @Prop({ required: false, default: PaymentMethodEnum.OTHER })
   paymentMethod: string;
 
   @Prop({ default: new Date() })
   createdAt: Date;
+
+  @Prop({ default: false })
+  deleted: boolean;
 }
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

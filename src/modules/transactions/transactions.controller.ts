@@ -11,11 +11,8 @@ export class TransactionsController {
     @Body() createTransactionDto: CreateTransactionDto,
     @Req() request: any,
   ) {
-    const token = request.user;
-    return this.transactionService.create({
-      amount: createTransactionDto.amount,
-      userId: token.userId,
-    });
+    const { userId } = request.user;
+    return this.transactionService.create(createTransactionDto, userId);
   }
 
   @Get('/of-user/:userId')
@@ -27,11 +24,14 @@ export class TransactionsController {
   @Get('/between-dates')
   findTransactionBetweenDates(
     @Body() findTransactionsBetweenDatesDto: FindTransactionsBetweenDatesDto,
+    @Req() request: any,
   ) {
+    const { userId } = request.user;
     const { finalDate, initialDate } = findTransactionsBetweenDatesDto;
     return this.transactionService.findTransactionsBetweenDates(
       initialDate,
       finalDate,
+      userId,
     );
   }
 
