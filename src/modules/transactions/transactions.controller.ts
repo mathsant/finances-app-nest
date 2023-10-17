@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Post, Req } from '@nestjs/common';
-import { CreateTransactionDto } from './dto';
+import { Body, Controller, Get, Param, Post, Req } from '@nestjs/common';
+import { CreateTransactionDto, FindTransactionsBetweenDatesDto } from './dto';
 import { TransactionsService } from './transactions.service';
 
 @Controller('transactions')
@@ -22,5 +22,21 @@ export class TransactionsController {
   findAllByUser(@Req() request: any) {
     const { userId } = request.user;
     return this.transactionService.findAllTransactionsByUser(userId);
+  }
+
+  @Get('/between-dates')
+  findTransactionBetweenDates(
+    @Body() findTransactionsBetweenDatesDto: FindTransactionsBetweenDatesDto,
+  ) {
+    const { finalDate, initialDate } = findTransactionsBetweenDatesDto;
+    return this.transactionService.findTransactionsBetweenDates(
+      initialDate,
+      finalDate,
+    );
+  }
+
+  @Get(':id')
+  findOneTransaction(@Param('id') id: string) {
+    return this.transactionService.findOne(id);
   }
 }

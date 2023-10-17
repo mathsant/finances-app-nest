@@ -21,6 +21,17 @@ export class TransactionsService {
     return this.transactionModel.find({ userId }).exec();
   }
 
+  async findOne(transactionId: string): Promise<Transaction> {
+    const transaction = await this.transactionModel
+      .findOne({ id: transactionId })
+      .exec();
+
+    if (isNil(transaction))
+      throw new NotFoundException({ message: 'Transaction not found.' });
+
+    return transaction;
+  }
+
   async create(transactionDto: CreateTransactionDto): Promise<Transaction> {
     const { amount, userId } = transactionDto;
 
@@ -47,5 +58,16 @@ export class TransactionsService {
     });
 
     return transactionCreated;
+  }
+
+  async findTransactionsBetweenDates(initialDate: Date, finalDate: Date) {
+    if (isNil(initialDate) || isNil(finalDate))
+      throw new BadRequestException({ message: 'Invalid Dates.' });
+
+    return this.transactionModel
+      .find({
+        createdAt: { $gte: new Date(initialDate), $lte: new Date(finalDate) },
+      })
+      .exec();
   }
 }

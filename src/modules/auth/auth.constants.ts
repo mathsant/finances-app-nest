@@ -1,3 +1,5 @@
+import { JWT_SECRET_KEY } from 'src/config/variables.env';
+
 export const jwtConstants = {
-  secret: 'secret_key',
+  secret: JWT_SECRET_KEY,
 };

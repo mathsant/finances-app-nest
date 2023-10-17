@@ -5,15 +5,14 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { TransactionsModule } from './modules/transactions/transactions.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { DATABASE_URL } from './config/variables.env';
 
 @Module({
   imports: [
     AuthModule,
     UsersModule,
     TransactionsModule,
-    MongooseModule.forRoot(
-      'mongodb+srv://admin:admin@development.1oqv3.mongodb.net/finances-app-nest?retryWrites=true&w=majority',
-    ),
+    MongooseModule.forRoot(DATABASE_URL),
   ],
   controllers: [AppController],
   providers: [AppService],
